@@ -156,7 +156,7 @@
       background: #dbeafe;
       border-color: var(--accent);
     }
-    .hidden { display: none; }
+    .hidden { display: none !important; }
     .alert {
       padding: 8px;
       border-radius: 4px;
@@ -174,7 +174,7 @@
       align-items: center;
       justify-content: center;
       padding: 16px;
-      z-index: 999;
+      z-index: 9999;
     }
     .modal-content {
       background: #ffffff;
@@ -182,7 +182,7 @@
       border-radius: 8px;
       max-width: 400px;
       width: 100%;
-      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.2);
     }
     .modal-title {
       font-size: 1rem;
@@ -207,6 +207,7 @@
     }
     .btn-primary-modal {
       background: var(--accent);
+      color: white;
       margin-top: 0;
     }
   </style>
@@ -233,13 +234,13 @@
       <label>Kode Kelas & Absen (Contoh: 7A01)</label>
       <input type="text" id="inputKode" placeholder="Masukkan Kode..." style="text-transform:uppercase">
     </div>
-    <button onclick="verifikasiSiswa()">Verifikasi & Lanjut</button>
+    <button type="button" onclick="verifikasiSiswa()">Verifikasi & Lanjut</button>
   </div>
 
   <!-- TAHAP 2: PILIH KATEGORI & ISI JAWABAN -->
   <div id="stepForm" class="hidden">
     <div style="background:#f1f5f9; padding:8px 10px; border-radius:4px; margin-bottom:10px; font-size:0.8rem;">
-      <strong>✅ Identitas sesuai:</strong> <span id="dispNama"></span> (<span id="dispKode"></span>)
+      <strong>✅ Identitas Sesuai:</strong> <span id="dispNama"></span> (<span id="dispKode"></span>)
     </div>
 
     <div class="form-group">
@@ -253,25 +254,25 @@
 
     <form id="quizForm"></form>
 
-    <button id="btnSubmit" class="hidden" onclick="konfirmasiKirim()">Kirim Jawaban</button>
+    <button type="button" id="btnSubmit" class="hidden" onclick="konfirmasiKirim()">Kirim Jawaban</button>
   </div>
 
   <!-- TAHAP 3: SELESAI -->
   <div id="stepDone" class="hidden" style="text-align:center; padding: 15px 0;">
     <h3 style="color:var(--primary); margin-top:0;">Jawaban Terkirim!</h3>
     <p style="font-size:0.85rem;">Terima kasih, jawaban kamu telah berhasil dicatat oleh sistem.</p>
-    <button onclick="location.reload()">Selesai / Kembali</button>
+    <button type="button" onclick="location.reload()">Selesai / Kembali</button>
   </div>
 </div>
 
-<!-- MODAL KONFIRMASI SOAL BELUM DIISI -->
+<!-- MODAL KONFIRMASI SOAL BELUM DIISI (PASTIKAN SEMBUNYI DENGAN CLASS hidden) -->
 <div id="confirmModal" class="modal-overlay hidden">
   <div class="modal-content">
     <div class="modal-title">Perhatian</div>
     <div class="modal-body" id="modalMessage"></div>
     <div class="modal-actions">
-      <button class="btn-secondary" onclick="tutupModal()">Lengkapi dulu</button>
-      <button class="btn-primary-modal" onclick="eksekusiKirim()">Abaikan saja</button>
+      <button type="button" class="btn-secondary" onclick="tutupModal()">Lengkapi dulu</button>
+      <button type="button" class="btn-primary-modal" onclick="eksekusiKirim()">Abaikan saja</button>
     </div>
   </div>
 </div>
@@ -295,7 +296,7 @@
 
   // KUNCI JAWABAN KELAS 7
   const keyBab1 = {
-    pg: "DABADDBAAAAABBBBCCCDCBBABBBDBD".split(""), // 30 Soal
+    pg: "DABADDBAAAAABBBBCCCDCBBABBBDBD".split(""),
     complex: [
       { type: "multi", keys: ["A","B","D"] },
       { type: "bool4", keys: ["Salah","Benar","Benar","Benar"] },
@@ -311,7 +312,7 @@
   };
 
   const keySts = {
-    pg: "CACCBAAAAAACBDDCACBBBAACDADACDCBACB".split(""), // 35 Soal
+    pg: "CACCBAAAAAACBDDCACBBBAACDADACDCBACB".split(""),
     complex: [
       { type: "multi", keys: ["B","D"] },
       { type: "multi", keys: ["A","C","D"] },
@@ -327,6 +328,7 @@
   };
 
   let activeUser = null;
+  let targetScrollElement = null;
 
   function showAlert(msg, type = "error") {
     const el = document.getElementById("alertBox");
@@ -375,7 +377,7 @@
     data.pg.forEach((_, idx) => {
       const qNum = idx + 1;
       html += `
-        <div class="question-card">
+        <div class="question-card" id="card_pg_${qNum}">
           <div class="question-title">Soal PG No. ${qNum}</div>
           <div class="options-grid">
             ${['A','B','C','D'].map(opt => `
@@ -394,7 +396,7 @@
       const qNum = idx + 1;
       if (item.type === "multi") {
         html += `
-          <div class="question-card">
+          <div class="question-card" id="card_cx_${qNum}">
             <div class="question-title">Soal Kompleks No. ${qNum} (Pilih Opsi yang Benar)</div>
             <div class="checkbox-group">
               ${['A','B','C','D'].map(opt => `
@@ -413,7 +415,7 @@
         }
 
         html += `
-          <div class="question-card">
+          <div class="question-card" id="card_cx_${qNum}">
             <div class="question-title">Soal Kompleks No. ${qNum}</div>
             ${[1, 2, 3, 4].map(sub => `
               <div class="sub-item">
@@ -432,7 +434,6 @@
     btn.classList.remove("hidden");
   }
 
-  // FUNGSI CEK SOAL YANG BELUM DIISI
   function formatDaftarNomor(arr) {
     if (arr.length === 0) return "";
     if (arr.length === 1) return arr[0].toString();
@@ -448,12 +449,16 @@
     const data = (kat === "bab1") ? keyBab1 : keySts;
     const pgBelum = [];
     const complexBelum = [];
+    targetScrollElement = null;
 
     // Cek PG
     data.pg.forEach((_, idx) => {
       const qNum = idx + 1;
       const selected = document.querySelector(`input[name="pg_${qNum}"]:checked`);
-      if (!selected) pgBelum.push(qNum);
+      if (!selected) {
+        pgBelum.push(qNum);
+        if (!targetScrollElement) targetScrollElement = document.getElementById(`card_pg_${qNum}`);
+      }
     });
 
     // Cek Complex
@@ -461,18 +466,24 @@
       const qNum = idx + 1;
       if (item.type === "multi") {
         const checked = document.querySelectorAll(`input[name="cx_${qNum}"]:checked`);
-        if (checked.length === 0) complexBelum.push(qNum);
+        if (checked.length === 0) {
+          complexBelum.push(qNum);
+          if (!targetScrollElement) targetScrollElement = document.getElementById(`card_cx_${qNum}`);
+        }
       } else {
         let terisi = true;
         for (let sub = 1; sub <= 4; sub++) {
           const selected = document.querySelector(`input[name="cx_${qNum}_${sub}"]:checked`);
           if (!selected) { terisi = false; break; }
         }
-        if (!terisi) complexBelum.push(qNum);
+        if (!terisi) {
+          complexBelum.push(qNum);
+          if (!targetScrollElement) targetScrollElement = document.getElementById(`card_cx_${qNum}`);
+        }
       }
     });
 
-    // Jika ada soal belum terisi, tampilkan modal
+    // Tampilkan modal jika ada soal terlewat
     if (pgBelum.length > 0 || complexBelum.length > 0) {
       let pesan = "soal ";
       const bagianPesan = [];
@@ -495,6 +506,9 @@
 
   function tutupModal() {
     document.getElementById("confirmModal").classList.add("hidden");
+    if (targetScrollElement) {
+      targetScrollElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
   }
 
   function hitungNilai(kat) {
@@ -540,7 +554,7 @@
   }
 
   async function eksekusiKirim() {
-    tutupModal();
+    document.getElementById("confirmModal").classList.add("hidden");
     const kat = document.getElementById("selectKategori").value;
     const nilaiFinal = hitungNilai(kat);
     
