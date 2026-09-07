@@ -164,6 +164,51 @@
       margin-bottom: 10px;
     }
     .alert-error { background: #fee2e2; color: #991b1b; }
+
+    /* STYLING MODAL NOTIFIKASI */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(15, 23, 42, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 999;
+    }
+    .modal-content {
+      background: #ffffff;
+      padding: 18px;
+      border-radius: 8px;
+      max-width: 400px;
+      width: 100%;
+      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+    }
+    .modal-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #991b1b;
+      margin-bottom: 8px;
+    }
+    .modal-body {
+      font-size: 0.85rem;
+      color: #334155;
+      margin-bottom: 16px;
+      line-height: 1.4;
+    }
+    .modal-actions {
+      display: flex;
+      gap: 8px;
+    }
+    .btn-secondary {
+      background: #e2e8f0;
+      color: #334155;
+      margin-top: 0;
+    }
+    .btn-primary-modal {
+      background: var(--accent);
+      margin-top: 0;
+    }
   </style>
 </head>
 <body>
@@ -194,7 +239,7 @@
   <!-- TAHAP 2: PILIH KATEGORI & ISI JAWABAN -->
   <div id="stepForm" class="hidden">
     <div style="background:#f1f5f9; padding:8px 10px; border-radius:4px; margin-bottom:10px; font-size:0.8rem;">
-      <strong>✅ Identitas Cocok :</strong> <span id="dispNama"></span> (<span id="dispKode"></span>)
+      <strong>✅ Identitas sesuai:</strong> <span id="dispNama"></span> (<span id="dispKode"></span>)
     </div>
 
     <div class="form-group">
@@ -208,7 +253,7 @@
 
     <form id="quizForm"></form>
 
-    <button id="btnSubmit" class="hidden" onclick="kirimJawaban()">Kirim Jawaban</button>
+    <button id="btnSubmit" class="hidden" onclick="konfirmasiKirim()">Kirim Jawaban</button>
   </div>
 
   <!-- TAHAP 3: SELESAI -->
@@ -216,6 +261,18 @@
     <h3 style="color:var(--primary); margin-top:0;">Jawaban Terkirim!</h3>
     <p style="font-size:0.85rem;">Terima kasih, jawaban kamu telah berhasil dicatat oleh sistem.</p>
     <button onclick="location.reload()">Selesai / Kembali</button>
+  </div>
+</div>
+
+<!-- MODAL KONFIRMASI SOAL BELUM DIISI -->
+<div id="confirmModal" class="modal-overlay hidden">
+  <div class="modal-content">
+    <div class="modal-title">Perhatian</div>
+    <div class="modal-body" id="modalMessage"></div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="tutupModal()">Lengkapi dulu</button>
+      <button class="btn-primary-modal" onclick="eksekusiKirim()">Abaikan saja</button>
+    </div>
   </div>
 </div>
 
@@ -375,6 +432,71 @@
     btn.classList.remove("hidden");
   }
 
+  // FUNGSI CEK SOAL YANG BELUM DIISI
+  function formatDaftarNomor(arr) {
+    if (arr.length === 0) return "";
+    if (arr.length === 1) return arr[0].toString();
+    if (arr.length === 2) return `${arr[0]} dan ${arr[1]}`;
+    return `${arr.slice(0, -1).join(", ")} dan ${arr[arr.length - 1]}`;
+  }
+
+  function konfirmasiKirim() {
+    hideAlert();
+    const kat = document.getElementById("selectKategori").value;
+    if (!kat) return showAlert("Pilih kategori terlebih dahulu!");
+
+    const data = (kat === "bab1") ? keyBab1 : keySts;
+    const pgBelum = [];
+    const complexBelum = [];
+
+    // Cek PG
+    data.pg.forEach((_, idx) => {
+      const qNum = idx + 1;
+      const selected = document.querySelector(`input[name="pg_${qNum}"]:checked`);
+      if (!selected) pgBelum.push(qNum);
+    });
+
+    // Cek Complex
+    data.complex.forEach((item, idx) => {
+      const qNum = idx + 1;
+      if (item.type === "multi") {
+        const checked = document.querySelectorAll(`input[name="cx_${qNum}"]:checked`);
+        if (checked.length === 0) complexBelum.push(qNum);
+      } else {
+        let terisi = true;
+        for (let sub = 1; sub <= 4; sub++) {
+          const selected = document.querySelector(`input[name="cx_${qNum}_${sub}"]:checked`);
+          if (!selected) { terisi = false; break; }
+        }
+        if (!terisi) complexBelum.push(qNum);
+      }
+    });
+
+    // Jika ada soal belum terisi, tampilkan modal
+    if (pgBelum.length > 0 || complexBelum.length > 0) {
+      let pesan = "soal ";
+      const bagianPesan = [];
+
+      if (pgBelum.length > 0) {
+        bagianPesan.push(`PG nomor ${formatDaftarNomor(pgBelum)}`);
+      }
+      if (complexBelum.length > 0) {
+        bagianPesan.push(`PG kompleks nomor ${formatDaftarNomor(complexBelum)}`);
+      }
+
+      pesan += bagianPesan.join(" dan ") + " belum di isi";
+
+      document.getElementById("modalMessage").innerText = pesan;
+      document.getElementById("confirmModal").classList.remove("hidden");
+    } else {
+      eksekusiKirim();
+    }
+  }
+
+  function tutupModal() {
+    document.getElementById("confirmModal").classList.add("hidden");
+  }
+
   function hitungNilai(kat) {
     const data = (kat === "bab1") ? keyBab1 : keySts;
     let skorDiperoleh = 0;
@@ -417,11 +539,9 @@
     return Math.round((skorDiperoleh / maxSkor) * 100);
   }
 
-  async function kirimJawaban() {
-    hideAlert();
+  async function eksekusiKirim() {
+    tutupModal();
     const kat = document.getElementById("selectKategori").value;
-    if (!kat) return showAlert("Pilih kategori terlebih dahulu!");
-
     const nilaiFinal = hitungNilai(kat);
     
     const labelKategori = (kat === "bab1") 
