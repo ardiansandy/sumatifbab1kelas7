@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Penilaian Sumatif IPS Kelas 7</title>
+  <style>
+    :root {
+      --primary: #0f172a;
+      --accent: #2563eb;
+      --bg: #f1f5f9;
+      --card: #ffffff;
+      --border: #e2e8f0;
+      --text: #1e293b;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 8px;
+      font-size: 0.875rem;
+    }
+    .container {
+      max-width: 500px;
+      margin: 0 auto;
+      background: var(--card);
+      padding: 14px;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+      font-size: 1.1rem;
+      color: var(--primary);
+      text-align: center;
+      margin: 0 0 2px 0;
+    }
+    .subtitle {
+      text-align: center;
+      font-size: 0.75rem;
+      color: #64748b;
+      margin-bottom: 10px;
+    }
+    .instructions {
+      background: #eff6ff;
+      border-left: 3px solid var(--accent);
+      padding: 8px 10px;
+      font-size: 0.8rem;
+      border-radius: 4px;
+      margin-bottom: 12px;
+      line-height: 1.4;
+    }
+    .form-group {
+      margin-bottom: 10px;
+    }
+    label {
+      display: block;
+      font-weight: 600;
+      font-size: 0.8rem;
+      margin-bottom: 3px;
+    }
+    input[type="text"], select {
+      width: 100%;
+      padding: 7px 9px;
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+      box-sizing: border-box;
+      font-size: 0.875rem;
+    }
+    button {
+      width: 100%;
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 10px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 5px;
+    }
+    button:disabled { background: #94a3b8; }
+    
+    /* COMPACT QUESTION CARD */
+    .section-title {
+      font-size: 0.9rem;
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 4px;
+      margin: 15px 0 10px 0;
+      color: var(--primary);
+    }
+    .question-card {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 8px 10px;
+      margin-bottom: 8px;
+      background: #fff;
+    }
+    .question-title {
+      font-weight: 600;
+      margin-bottom: 6px;
+      font-size: 0.8rem;
+      color: #334155;
+    }
+    .options-grid {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .options-grid label {
+      flex: 1;
+      min-width: 40px;
+      text-align: center;
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      padding: 5px 0;
+      border-radius: 4px;
+      font-weight: normal;
+      cursor: pointer;
+      margin: 0;
+      font-size: 0.8rem;
+    }
+    .options-grid input { display: none; }
+    .options-grid label:has(input:checked) {
+      border-color: var(--accent);
+      background: #dbeafe;
+      font-weight: bold;
+      color: var(--accent);
+    }
+    .sub-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 4px 0;
+      border-bottom: 1px dashed #f1f5f9;
+      font-size: 0.8rem;
+    }
+    .checkbox-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .checkbox-group label {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-weight: normal;
+      margin: 0;
+      font-size: 0.8rem;
+      background: #f8fafc;
+      padding: 4px 8px;
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+    }
+    .checkbox-group label:has(input:checked) {
+      background: #dbeafe;
+      border-color: var(--accent);
+    }
+    .hidden { display: none; }
+    .alert {
+      padding: 8px;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      margin-bottom: 10px;
+    }
+    .alert-error { background: #fee2e2; color: #991b1b; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Penilaian Sumatif IPS Kelas 7</h1>
+  <div class="subtitle">Tahun Pelajaran 2026/2027</div>
+
+  <div class="instructions">
+    Lihat soal di LKS kalian masing-masing, penilaian sumatif bab 1 <strong>halaman 46</strong> dan sumatif tengah semester <strong>halaman 53</strong>. Kerjakan secara mandiri di buku LKS bagian I dan II saja, lalu input jawabannya di bawah ini.
+  </div>
+
+  <div id="alertBox" class="alert hidden"></div>
+
+  <!-- TAHAP 1: VERIFIKASI SISWA -->
+  <div id="stepAuth">
+    <div class="form-group">
+      <label>Nama Lengkap</label>
+      <input type="text" id="inputNama" placeholder="Masukkan Nama Lengkap...">
+    </div>
+    <div class="form-group">
+      <label>Kode Kelas & Absen (Contoh: 7A01)</label>
+      <input type="text" id="inputKode" placeholder="Masukkan Kode..." style="text-transform:uppercase">
+    </div>
+    <button onclick="verifikasiSiswa()">Verifikasi & Lanjut</button>
+  </div>
+
+  <!-- TAHAP 2: PILIH KATEGORI & ISI JAWABAN -->
+  <div id="stepForm" class="hidden">
+    <div style="background:#f1f5f9; padding:8px 10px; border-radius:4px; margin-bottom:10px; font-size:0.8rem;">
+      <strong>Siswa:</strong> <span id="dispNama"></span> (<span id="dispKode"></span>)
+    </div>
+
+    <div class="form-group">
+      <label>Pilih Kategori Ujian</label>
+      <select id="selectKategori" onchange="renderSoal()">
+        <option value="">-- Pilih Kategori --</option>
+        <option value="bab1">LKS Penilaian sumatif Bab 1 Kehidupan Sosial dan Lingkungan Sekitar</option>
+        <option value="sts">LKS PSTS Bab 1 Kehidupan Sosial dan Lingkungan Sekitar</option>
+      </select>
+    </div>
+
+    <form id="quizForm"></form>
+
+    <button id="btnSubmit" class="hidden" onclick="kirimJawaban()">Kirim Jawaban</button>
+  </div>
+
+  <!-- TAHAP 3: SELESAI -->
+  <div id="stepDone" class="hidden" style="text-align:center; padding: 15px 0;">
+    <h3 style="color:var(--primary); margin-top:0;">Jawaban Terkirim!</h3>
+    <p style="font-size:0.85rem;">Terima kasih, jawaban kamu telah berhasil dicatat oleh sistem.</p>
+    <button onclick="location.reload()">Selesai / Kembali</button>
+  </div>
+</div>
+
+<script>
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzf0cTV9hR2g774ExSooOQOVuLb-tJ3AyOS1tNEimbAREHm4lc0HnrpKlgk2wMgLnPQEg/exec";
+
+  // DATA SISWA KELAS 7
+  const rawSiswa = "7A01AFIKA NAUFALIN INARA7A02ALMIRA QIANNA NURSHAQILLA7A03ASMA ANBIYA RAHMAH7A04DARIN NAZHIFA AZZAHRA7A05DEANNISA AURA LATIFA7A06DELISHA SHADRINA ATHIRAH7A07DZAKIRAN FILDZAH NIZZA NUGRAHA7A08DZAKIYYAH RAMADHANI FIRDAUSY7A09FATHIA SYIFA AFIFAH7A10FATHIMAH JAUHAR NAFISAH7A11FELIZA NUR SOFIANIDA WALAGRY7A12FREYA AKYAS TAUFANI SYAKIRA7A13GEA ELFARIZA KUSWANDI7A14KAMILA NAZWA KUSUMAH7A15KEISHA ASYABIYYA GUSDEANTY7A16KHAIRA SUKMA KARIM7A17MICHELLE DARIAN MUNJIYYA7A18MIQKEYLA KHAIRA AZZAHRA7A19MUTIARA AULIYA TSANIYAH7A20NAFIA FAZTA ZAARA7A21NUFAISAH ODELINA ASKANAH7A22RAISA DWI SEPUTRI7A23RAISA MAULIDA SUHENDAR7A24RAISHA HILYATUSH SHOLIHAH7A25SHAQYLA ZAHRA FATINA7A26SITI AZKA DZAHABIYYAH EDWAR7A27SYADIRA KHAERUNNISA7A28SYAHLA KHALIFA DWI ANDIRA7A29SYIFA FARZANA LISDIANTI7A30SYIFA JAGADDHITA PRABAWA7A31TAZKIYA AZ ZAHRA FIRDAUS7A32TSABITA ATHAYA MUMTAZ7A33XENA AQILAMAJID PUTRI NEREAY7A34ZAHRA KHADZIYA NISRINA7A35ZALFA SYABANIA RAHMAN7A36ZARINA KHANZA ASKA SUDEWA7B01ADIBA RAISYA YASMIN7B02AFIZA RAFANDA SYAHRONI7B03ALISSA MAERA THARSA7B04AMANDA NAURA AUNI7B05ANITA FATIMAH AZAHRA7B06ARIQA FATINA FARHA7B07BILQIS AGISTA KIRANA7B08CHAERUNISSA RAMADHANTI7B09DHIYA KHANZA LATHIFAH7B10DINDA ALENA DEANOVA7B11FARANNISA FADHILAH7B12FIRNI NAILA ZAHIRA7B13KANAYA PUTRI PRATIWI7B14KAYLA ADINDA CHANTIKA7B15KHAIRA SHAFIYA ELVARETTA7B16KHAIRANA ZHAFIRA7B17KIMORA PUTRI GHARESTI7B18MEDHIVA ALMAIRA7B19MEISYA RAHMA FAUZIAH7B20NAILA SALSABILA7B21NAURA DWI PUTRI PRATAMA7B22NAVISHA SHAKILA PUTRI7B23NUR MADINAH7B24RAISA MIKAILA SADILA7B25RAISYA SHIDQIA HUMAIRA7B26RAIYSA MULYANI7B27RALUNA QANITHA7B28SAFEERA ARIA ALHUMAERA7B29SALSABILA NADHIFA WIBOWO7B30SALSABILA PUTRI RAMADHANI7B31SALWA MUFIDAH FAUZIYAH7B32SANDIORYZA SATIVA IRZEAQIILAH7B33SHIDQIA ZAHWA AHDIWIJAYA7B34SYAHLA AZZALEA SABRINA7B35SYIFA SALSABILA ELSYARIF7B36TASYA ARSYILLAH7B37THALITA KHANZA KIRANA";
+
+  // PARSING DATA SISWA
+  const dbSiswa = {};
+  const matches = rawSiswa.match(/7[A-B]\d{2}[^7]+/g);
+  if (matches) {
+    matches.forEach(item => {
+      const kode = item.substring(0, 4);
+      const nama = item.substring(4).trim();
+      dbSiswa[kode] = nama;
+    });
+  }
+
+  // KUNCI JAWABAN KELAS 7
+  const keyBab1 = {
+    pg: "DABADDBAAAAABBBBCCCDCBBABBBDBD".split(""), // 30 Soal
+    complex: [
+      { type: "multi", keys: ["A","B","D"] },
+      { type: "bool4", keys: ["Salah","Benar","Benar","Benar"] },
+      { type: "multi", keys: ["A","C"] },
+      { type: "bool4", keys: ["Tidak sesuai","Sesuai","Sesuai","Tidak sesuai"] },
+      { type: "multi", keys: ["A","B"] },
+      { type: "multi", keys: ["B","C","D"] },
+      { type: "multi", keys: ["A","C","D"] },
+      { type: "bool4", keys: ["Benar","Benar","Salah","Salah"] },
+      { type: "multi", keys: ["A","C"] },
+      { type: "bool4", keys: ["Salah","Benar","Salah","Salah"] }
+    ]
+  };
+
+  const keySts = {
+    pg: "CACCBAAAAAACBDDCACBBBAACDADACDCBACB".split(""), // 35 Soal
+    complex: [
+      { type: "multi", keys: ["B","D"] },
+      { type: "multi", keys: ["A","C","D"] },
+      { type: "multi", keys: ["A","B"] },
+      { type: "bool4", keys: ["Salah","Salah","Benar","Benar"] },
+      { type: "multi", keys: ["B","C"] },
+      { type: "multi", keys: ["A","D"] },
+      { type: "bool4", keys: ["Tepat","Tidak tepat","Tepat","Tidak tepat"] },
+      { type: "multi", keys: ["A","C"] },
+      { type: "multi", keys: ["A","B","C"] },
+      { type: "bool4", keys: ["Salah","Benar","Salah","Benar"] }
+    ]
+  };
+
+  let activeUser = null;
+
+  function showAlert(msg, type = "error") {
+    const el = document.getElementById("alertBox");
+    el.className = `alert alert-${type}`;
+    el.innerText = msg;
+    el.classList.remove("hidden");
+  }
+
+  function hideAlert() {
+    document.getElementById("alertBox").classList.add("hidden");
+  }
+
+  function verifikasiSiswa() {
+    hideAlert();
+    const kode = document.getElementById("inputKode").value.trim().toUpperCase();
+    const nama = document.getElementById("inputNama").value.trim().toUpperCase();
+
+    if (!kode || !nama) return showAlert("Lengkapi Kode dan Nama!");
+
+    if (dbSiswa[kode] && dbSiswa[kode].toUpperCase() === nama) {
+      activeUser = { kode, nama: dbSiswa[kode] };
+      document.getElementById("stepAuth").classList.add("hidden");
+      document.getElementById("stepForm").classList.remove("hidden");
+      document.getElementById("dispNama").innerText = activeUser.nama;
+      document.getElementById("dispKode").innerText = activeUser.kode;
+    } else {
+      showAlert("Kode Kelas / Nama Lengkap tidak cocok dengan data!");
+    }
+  }
+
+  function renderSoal() {
+    const kat = document.getElementById("selectKategori").value;
+    const form = document.getElementById("quizForm");
+    const btn = document.getElementById("btnSubmit");
+    form.innerHTML = "";
+
+    if (!kat) {
+      btn.classList.add("hidden");
+      return;
+    }
+
+    const data = (kat === "bab1") ? keyBab1 : keySts;
+
+    // RENDER PG
+    let html = `<div class="section-title">Bagian I: Pilihan Ganda</div>`;
+    data.pg.forEach((_, idx) => {
+      const qNum = idx + 1;
+      html += `
+        <div class="question-card">
+          <div class="question-title">Soal PG No. ${qNum}</div>
+          <div class="options-grid">
+            ${['A','B','C','D'].map(opt => `
+              <label>
+                <input type="radio" name="pg_${qNum}" value="${opt}">
+                <span>${opt}</span>
+              </label>
+            `).join('')}
+          </div>
+        </div>`;
+    });
+
+    // RENDER COMPLEX
+    html += `<div class="section-title">Bagian II: Pilihan Ganda Kompleks</div>`;
+    data.complex.forEach((item, idx) => {
+      const qNum = idx + 1;
+      if (item.type === "multi") {
+        html += `
+          <div class="question-card">
+            <div class="question-title">Soal Kompleks No. ${qNum} (Pilih Opsi yang Benar)</div>
+            <div class="checkbox-group">
+              ${['A','B','C','D'].map(opt => `
+                <label><input type="checkbox" name="cx_${qNum}" value="${opt}"> Pilihan ${opt}</label>
+              `).join('')}
+            </div>
+          </div>`;
+      } else {
+        const firstKey = item.keys[0].toLowerCase();
+        let labels = ["Benar", "Salah"];
+        
+        if (firstKey === "tidak sesuai" || firstKey === "sesuai") {
+          labels = ["Sesuai", "Tidak sesuai"];
+        } else if (firstKey === "tepat" || firstKey === "tidak tepat") {
+          labels = ["Tepat", "Tidak tepat"];
+        }
+
+        html += `
+          <div class="question-card">
+            <div class="question-title">Soal Kompleks No. ${qNum}</div>
+            ${[1, 2, 3, 4].map(sub => `
+              <div class="sub-item">
+                <span>Pernyataan ${sub}</span>
+                <div class="options-grid" style="width: auto;">
+                  <label><input type="radio" name="cx_${qNum}_${sub}" value="${labels[0]}"> <span>${labels[0]}</span></label>
+                  <label><input type="radio" name="cx_${qNum}_${sub}" value="${labels[1]}"> <span>${labels[1]}</span></label>
+                </div>
+              </div>
+            `).join('')}
+          </div>`;
+      }
+    });
+
+    form.innerHTML = html;
+    btn.classList.remove("hidden");
+  }
+
+  function hitungNilai(kat) {
+    const data = (kat === "bab1") ? keyBab1 : keySts;
+    let skorDiperoleh = 0;
+
+    // PG (Benar x 2 Poin)
+    const totalPgPoin = data.pg.length * 2;
+    data.pg.forEach((key, idx) => {
+      const selected = document.querySelector(`input[name="pg_${idx + 1}"]:checked`);
+      if (selected && selected.value === key) {
+        skorDiperoleh += 2;
+      }
+    });
+
+    // Complex (Per Item Benar = 1 Poin)
+    let totalComplexPoin = 0;
+    data.complex.forEach((item, idx) => {
+      const qNum = idx + 1;
+      if (item.type === "multi") {
+        totalComplexPoin += 4;
+        const selected = Array.from(document.querySelectorAll(`input[name="cx_${qNum}"]:checked`)).map(el => el.value);
+        ['A','B','C','D'].forEach(opt => {
+          const isKey = item.keys.includes(opt);
+          const isChosen = selected.includes(opt);
+          if ((isKey && isChosen) || (!isKey && !isChosen)) {
+            skorDiperoleh += 1;
+          }
+        });
+      } else {
+        totalComplexPoin += 4;
+        [1, 2, 3, 4].forEach(sub => {
+          const selected = document.querySelector(`input[name="cx_${qNum}_${sub}"]:checked`);
+          if (selected && selected.value.toLowerCase() === item.keys[sub - 1].toLowerCase()) {
+            skorDiperoleh += 1;
+          }
+        });
+      }
+    });
+
+    const maxSkor = totalPgPoin + totalComplexPoin;
+    return Math.round((skorDiperoleh / maxSkor) * 100);
+  }
+
+  async function kirimJawaban() {
+    hideAlert();
+    const kat = document.getElementById("selectKategori").value;
+    if (!kat) return showAlert("Pilih kategori terlebih dahulu!");
+
+    const nilaiFinal = hitungNilai(kat);
+    
+    const labelKategori = (kat === "bab1") 
+      ? "LKS Penilaian sumatif Bab 1 Kehidupan Sosial dan Lingkungan Sekitar" 
+      : "LKS PSTS Bab 1 Kehidupan Sosial dan Lingkungan Sekitar";
+
+    const payload = {
+      idMurid: activeUser.kode,
+      hasil: [
+        {
+          kategori: labelKategori,
+          nilai: nilaiFinal
+        }
+      ]
+    };
+
+    const btn = document.getElementById("btnSubmit");
+    btn.disabled = true;
+    btn.innerText = "Mengirim...";
+
+    try {
+      const res = await fetch(SCRIPT_URL, {
+        method: "POST",
+        body: JSON.stringify(payload)
+      });
+      const result = await res.json();
+
+      if (result.status === "success") {
+        document.getElementById("stepForm").classList.add("hidden");
+        document.getElementById("stepDone").classList.remove("hidden");
+      } else {
+        showAlert("Gagal menyimpan: " + result.message);
+        btn.disabled = false;
+        btn.innerText = "Kirim Jawaban";
+      }
+    } catch (err) {
+      showAlert("Terjadi kesalahan jaringan/server!");
+      btn.disabled = false;
+      btn.innerText = "Kirim Jawaban";
+    }
+  }
+</script>
+
+</body>
+</html>
